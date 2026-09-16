@@ -9,6 +9,11 @@ import {
   type CourseDetails,
   type MeResponse,
   type ProfileBootstrapInput,
+  activeRoundResponseSchema,
+  createRoundInputSchema,
+  roundResponseSchema,
+  type CreateRoundInput,
+  type RoundDetails,
 } from '@golf-track/shared';
 import { environment } from './env';
 
@@ -82,4 +87,22 @@ export async function updateCourse(
 }
 export async function archiveCourse(accessToken: string, id: string) {
   await request(`/courses/${id}/archive`, accessToken, { method: 'POST' });
+}
+export async function getActiveRound(accessToken: string): Promise<RoundDetails | null> {
+  const response = await request('/rounds/active', accessToken);
+  return activeRoundResponseSchema.parse(await response.json()).round;
+}
+export async function createRound(
+  accessToken: string,
+  input: CreateRoundInput,
+): Promise<RoundDetails> {
+  const response = await request('/rounds', accessToken, {
+    method: 'POST',
+    body: JSON.stringify(createRoundInputSchema.parse(input)),
+  });
+  return roundResponseSchema.parse(await response.json()).round;
+}
+export async function getRound(accessToken: string, id: string): Promise<RoundDetails> {
+  const response = await request(`/rounds/${id}`, accessToken);
+  return roundResponseSchema.parse(await response.json()).round;
 }

@@ -7,6 +7,8 @@ import {
   type CourseRepository,
 } from './modules/courses/course.repository.js';
 import { profileRoutes } from './modules/profiles/profile.routes.js';
+import { roundRoutes } from './modules/rounds/round.routes.js';
+import { createRoundRepository, type RoundRepository } from './modules/rounds/round.repository.js';
 import {
   createProfileRepository,
   type ProfileRepository,
@@ -21,6 +23,7 @@ export interface AppOptions {
   authVerifier?: AuthVerifier;
   profileRepository?: ProfileRepository;
   courseRepository?: CourseRepository;
+  roundRepository?: RoundRepository;
 }
 
 export async function buildApp(options: AppOptions = {}): Promise<FastifyInstance> {
@@ -30,8 +33,8 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
     origin: environment.ALLOWED_ORIGIN,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'OPTIONS'],
     allowedHeaders: ['Authorization', 'Content-Type'],
-    });
-  if (!options.profileRepository || !options.courseRepository)
+  });
+  if (!options.profileRepository || !options.courseRepository || !options.roundRepository)
     await app.register(databasePlugin, environment);
   await app.register(
     authenticationPlugin,
@@ -55,7 +58,9 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
   app.get('/health', async () => ({ status: 'ok' }));
   const profileRepository = options.profileRepository ?? createProfileRepository(app.db);
   const courseRepository = options.courseRepository ?? createCourseRepository(app.db);
+  const roundRepository = options.roundRepository ?? createRoundRepository(app.db);
   await app.register(async (api) => profileRoutes(api, profileRepository), { prefix: '/api/v1' });
   await app.register(async (api) => courseRoutes(api, courseRepository), { prefix: '/api/v1' });
+  await app.register(async (api) => roundRoutes(api, roundRepository), { prefix: '/api/v1' });
   return app;
 }

@@ -34,9 +34,10 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../layouts/AppLayout.vue'),
     meta: { requiresAuth: true, requiresProfile: true },
     children: [
-      { path: '', ...view('Home') },
+      { path: '', component: () => import('../views/HomeView.vue') },
       { path: 'rounds', ...view('Rounds') },
-      { path: 'round/start', ...view('Start Round') },
+      { path: 'round/start', component: () => import('../views/RoundSetupView.vue') },
+      { path: 'rounds/:roundId/play', component: () => import('../views/ActiveRoundView.vue') },
       { path: 'courses', component: () => import('../views/CourseListView.vue') },
       { path: 'courses/new', component: () => import('../views/CourseFormView.vue') },
       { path: 'courses/:courseId', component: () => import('../views/CourseDetailsView.vue') },

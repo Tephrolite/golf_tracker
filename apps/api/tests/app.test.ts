@@ -6,6 +6,7 @@ import type { Environment } from '../src/config/env.js';
 import type { AuthVerifier } from '../src/plugins/auth.js';
 import type { ProfileRepository } from '../src/modules/profiles/profile.repository.js';
 import type { CourseRepository } from '../src/modules/courses/course.repository.js';
+import type { RoundRepository } from '../src/modules/rounds/round.repository.js';
 import { parseRequest } from '../src/validation.js';
 
 const environment: Environment = {
@@ -83,6 +84,39 @@ const courseRepository: CourseRepository = {
   replace: async () => course,
   archive: async () => 'archived',
 };
+const round = {
+  id: 'e1b2c3d4-1111-4222-8333-444444444444',
+  status: 'in_progress' as const,
+  trackingMode: 'basic' as const,
+  scheduledHoleCount: 9,
+  startingHoleNumber: 1,
+  playedOn: '2026-09-17',
+  startedAt: '2026-09-17T10:00:00.000Z',
+  revision: 1,
+  courseId: course.id,
+  courseTeeId: course.tees[0]!.id,
+  courseNameSnapshot: course.name,
+  courseLocationSnapshot: course.locationText,
+  teeNameSnapshot: 'Blue',
+  courseRatingSnapshot: null,
+  slopeRatingSnapshot: null,
+  courseParSnapshot: 36,
+  holes: Array.from({ length: 9 }, (_, index) => ({
+    id: `${index + 1}1b2c3d4-1111-4222-8333-444444444444`,
+    holeNumber: index + 1,
+    playSequence: index + 1,
+    par: 4,
+    yardage: 300,
+    strokeIndex: index + 1,
+    revision: 1,
+  })),
+};
+const roundRepository: RoundRepository = {
+  findUserId: async () => profile.id,
+  findActive: async () => null,
+  findOwned: async () => round,
+  start: async () => round,
+};
 const courseUpdatePayload = {
   name: 'Pine Ridge',
   locationText: 'Austin',
@@ -101,12 +135,14 @@ async function makeApp(
   authVerifier = rejectedAuth,
   profileRepository = repository,
   courses = courseRepository,
+  roundRepositoryOption = roundRepository,
 ) {
   const app = await buildApp({
     environment,
     authVerifier,
     profileRepository,
     courseRepository: courses,
+    roundRepository: roundRepositoryOption,
   });
   apps.push(app);
   return app;
@@ -196,6 +232,77 @@ describe('application routes', () => {
   it('requires authentication for course catalog requests', async () => {
     const response = await (await makeApp()).inject({ method: 'GET', url: '/api/v1/courses' });
     expect(response.statusCode).toBe(401);
+  });
+  it('returns an explicit null response when no active round exists', async () => {
+    const auth: AuthVerifier = {
+      verify: async () => ({ subject: 'subject', email: 'verified@example.com' }),
+    };
+    const response = await (
+      await makeApp(auth)
+    ).inject({
+      method: 'GET',
+      url: '/api/v1/rounds/active',
+      headers: { authorization: 'Bearer token' },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ round: null });
+  });
+  it('creates and retrieves an owned active round', async () => {
+    const auth: AuthVerifier = {
+      verify: async () => ({ subject: 'subject', email: 'verified@example.com' }),
+    };
+    const active: RoundRepository = { ...roundRepository, findActive: async () => round };
+    const payload = {
+      courseId: course.id,
+      courseTeeId: course.tees[0]!.id,
+      scheduledHoleCount: 9,
+      startingHoleNumber: 1,
+      trackingMode: 'basic',
+      playedOn: '2026-09-17',
+    };
+    const app = await makeApp(auth, repository, courseRepository, active);
+    const created = await app.inject({
+      method: 'POST',
+      url: '/api/v1/rounds',
+      headers: { authorization: 'Bearer token' },
+      payload,
+    });
+    expect(created.statusCode).toBe(201);
+    expect(created.json().round.holes).toHaveLength(9);
+    const current = await app.inject({
+      method: 'GET',
+      url: '/api/v1/rounds/active',
+      headers: { authorization: 'Bearer token' },
+    });
+    expect(current.statusCode).toBe(200);
+    expect(current.json().round.id).toBe(round.id);
+    const owned = await app.inject({
+      method: 'GET',
+      url: `/api/v1/rounds/${round.id}`,
+      headers: { authorization: 'Bearer token' },
+    });
+    expect(owned.statusCode).toBe(200);
+  });
+  it('validates create-round bodies and hides unowned rounds', async () => {
+    const auth: AuthVerifier = {
+      verify: async () => ({ subject: 'subject', email: 'verified@example.com' }),
+    };
+    const hidden: RoundRepository = { ...roundRepository, findOwned: async () => null };
+    const app = await makeApp(auth, repository, courseRepository, hidden);
+    const invalid = await app.inject({
+      method: 'POST',
+      url: '/api/v1/rounds',
+      headers: { authorization: 'Bearer token' },
+      payload: { playedOn: '2026-02-30' },
+    });
+    expect(invalid.statusCode).toBe(400);
+    const unowned = await app.inject({
+      method: 'GET',
+      url: `/api/v1/rounds/${round.id}`,
+      headers: { authorization: 'Bearer token' },
+    });
+    expect(unowned.statusCode).toBe(404);
+    expect(unowned.json().error.code).toBe('ROUND_NOT_FOUND');
   });
   it('lists active shared courses for the verified application user', async () => {
     const auth: AuthVerifier = {

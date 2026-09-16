@@ -166,6 +166,62 @@ export const courseListResponseSchema = z.object({
 });
 export const courseResponseSchema = z.object({ course: courseDetailsSchema });
 
+const calendarDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((value) => {
+    const parts = value.split('-').map(Number);
+    const year = parts[0]!;
+    const month = parts[1]!;
+    const day = parts[2]!;
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() === month - 1 &&
+      date.getUTCDate() === day
+    );
+  }, 'Enter a valid calendar date.');
+export const createRoundInputSchema = z
+  .object({
+    courseId: z.string().uuid(),
+    courseTeeId: z.string().uuid(),
+    scheduledHoleCount: z.union([z.literal(9), z.literal(18)]),
+    startingHoleNumber: z.number().int().min(1).max(18),
+    trackingMode: z.enum(TRACKING_MODES),
+    playedOn: calendarDateSchema,
+  })
+  .strict();
+export const roundHoleSchema = z.object({
+  id: z.string().uuid(),
+  holeNumber: z.number().int(),
+  playSequence: z.number().int().positive(),
+  par: z.number().int(),
+  yardage: z.number().int().nullable(),
+  strokeIndex: z.number().int().nullable(),
+  revision: z.number().int().positive(),
+});
+export const roundDetailsSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(ROUND_STATUSES),
+  trackingMode: z.enum(TRACKING_MODES),
+  scheduledHoleCount: z.number().int(),
+  startingHoleNumber: z.number().int(),
+  playedOn: calendarDateSchema,
+  startedAt: z.string().datetime(),
+  revision: z.number().int().positive(),
+  courseId: z.string().uuid().nullable(),
+  courseTeeId: z.string().uuid().nullable(),
+  courseNameSnapshot: z.string(),
+  courseLocationSnapshot: z.string().nullable(),
+  teeNameSnapshot: z.string(),
+  courseRatingSnapshot: z.number().nullable(),
+  slopeRatingSnapshot: z.number().int().nullable(),
+  courseParSnapshot: z.number().int().nullable(),
+  holes: z.array(roundHoleSchema),
+});
+export const roundResponseSchema = z.object({ round: roundDetailsSchema });
+export const activeRoundResponseSchema = z.object({ round: roundDetailsSchema.nullable() });
+
 export const meResponseSchema = z.object({ profile: profileSchema.nullable() });
 
 export const errorResponseSchema = z.object({
@@ -182,3 +238,6 @@ export type CourseInput = z.infer<typeof courseInputSchema>;
 export type CourseUpdateInput = z.infer<typeof courseUpdateInputSchema>;
 export type CourseSummary = z.infer<typeof courseSummarySchema>;
 export type CourseDetails = z.infer<typeof courseDetailsSchema>;
+export type CreateRoundInput = z.infer<typeof createRoundInputSchema>;
+export type RoundDetails = z.infer<typeof roundDetailsSchema>;
+export type RoundHole = z.infer<typeof roundHoleSchema>;

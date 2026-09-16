@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { activeRoundResponseSchema, createRoundInputSchema } from '../src/index.js';
 import { meResponseSchema, profileSchema, registrationSchema } from '../src/index.js';
 
 describe('shared schemas', () => {
@@ -36,5 +37,35 @@ describe('shared schemas', () => {
         passwordConfirmation: 'different',
       }).success,
     ).toBe(false);
+  });
+});
+
+describe('round schemas', () => {
+  const input = {
+    courseId: 'a1b2c3d4-1111-4222-8333-444444444444',
+    courseTeeId: 'b1b2c3d4-1111-4222-8333-444444444444',
+    scheduledHoleCount: 9,
+    startingHoleNumber: 1,
+    trackingMode: 'basic',
+    playedOn: '2026-09-17',
+  };
+  it('accepts a valid round setup and explicit no-active response', () => {
+    expect(createRoundInputSchema.parse(input)).toMatchObject(input);
+    expect(activeRoundResponseSchema.parse({ round: null })).toEqual({ round: null });
+  });
+  it('rejects invalid UUIDs, configuration values, and impossible dates', () => {
+    expect(createRoundInputSchema.safeParse({ ...input, courseId: 'bad' }).success).toBe(false);
+    expect(createRoundInputSchema.safeParse({ ...input, scheduledHoleCount: 12 }).success).toBe(
+      false,
+    );
+    expect(createRoundInputSchema.safeParse({ ...input, startingHoleNumber: 19 }).success).toBe(
+      false,
+    );
+    expect(createRoundInputSchema.safeParse({ ...input, trackingMode: 'other' }).success).toBe(
+      false,
+    );
+    expect(createRoundInputSchema.safeParse({ ...input, playedOn: '2026-02-30' }).success).toBe(
+      false,
+    );
   });
 });

@@ -120,6 +120,22 @@ The API exposes `GET /health`, protected `GET /api/v1/me`, and a protected cours
 
 Each course must provide every sequential hole, unique tee names and display order, unique stroke indexes, and a yardage for every tee/hole pair. Potential same-name/location matches require explicit `acknowledgeDuplicate: true`; the warning does not expose owner permissions. The API derives the application owner from the verified access token, never a browser-submitted user ID. Round tracking is not included.
 
+## Round Setup And Resume
+
+The protected round API provides `GET /api/v1/rounds/active`, `POST /api/v1/rounds`, and `GET /api/v1/rounds/:roundId`. Starting a round creates the in-progress round and its ordered hole snapshots in one transaction. It accepts an active accessible course, an active tee from that course, 9 or 18 holes as supported by the course, a valid start hole, `basic` or `detailed` tracking, and a `YYYY-MM-DD` played-on date. The API snapshots course, tee, rating, slope, par, and hole data, so later course edits cannot alter the round.
+
+Only one in-progress round may exist per user. `GET /rounds/active` returns `{ "round": null }` when none exists. The web app loads this server state after profile restoration, shows a Home resume card, and changes the center navigation action from Start to Resume. Score entry, completion, and abandonment remain deferred.
+
+For development-only manual testing, do not add a deletion endpoint. In a disposable local database, end a test round with SQL such as:
+
+```sql
+UPDATE rounds
+SET status = 'abandoned', abandoned_at = now(), updated_at = now()
+WHERE user_id = '<development-user-id>' AND status = 'in_progress';
+```
+
+Never use this statement against a production database.
+
 Authentication routes are `/sign-in`, `/register`, `/auth/callback`, and `/profile/complete`. Provisioned accounts use `/app`. Post-authentication redirects accept only validated internal paths.
 
 ## Quality Commands
@@ -135,6 +151,6 @@ npm run db:studio
 
 ## Intentional Limitations
 
-- Round CRUD, round persistence, IndexedDB sync, password reset, social login, and conflict resolution beyond course optimistic saves are pending.
+- Hole scoring, round completion/history, IndexedDB sync, password reset, social login, and conflict resolution beyond course optimistic saves are pending.
 - Handicap storage is present, but no formula or recalculation job is implemented.
 - Account-retention/re-registration policy and browser Data API policies remain intentionally undecided; API authorization remains mandatory.
