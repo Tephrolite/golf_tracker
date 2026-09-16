@@ -1,6 +1,6 @@
 # Golf Track
 
-Mobile-first golf round tracking, built as a TypeScript npm-workspace monorepo. This repository establishes the V1 application foundation; it does not yet implement scoring workflows, offline synchronization, the handicap calculation, or a production course catalog.
+Mobile-first golf round tracking, built as a TypeScript npm-workspace monorepo. It includes authentication, profile provisioning, and a shared course catalog; scoring workflows, offline synchronization, and handicap calculation remain out of scope.
 
 ## Architecture
 
@@ -30,7 +30,7 @@ packages/
 docs/                  Approved V1 screen and database specifications
 ```
 
-Backend domains live below `apps/api/src/modules`; `profiles` demonstrates the route -> authentication -> service -> repository layering. Future `courses`, `rounds`, and `handicap` domains belong alongside it.
+Backend domains live below `apps/api/src/modules`. Profiles and courses use route -> authentication -> service -> repository layering. Round and handicap domains remain future work.
 
 ## Prerequisites
 
@@ -110,7 +110,15 @@ npm run dev:web   # Vite only
 npm run dev:api   # Fastify only
 ```
 
-The API exposes `GET /health` and protected `GET /api/v1/me`. The client includes public/protected route metadata, an initial auth-loading guard, public/app layouts, and a five-item mobile navigation shell.
+The API exposes `GET /health`, protected `GET /api/v1/me`, and a protected course catalog:
+
+- `GET /api/v1/courses` supports offset pagination and a parameterized name/location search.
+- `GET /api/v1/courses/:courseId` returns active shared courses to signed-in users; private, draft, and archived courses are owner-only.
+- `POST /api/v1/courses` creates an active shared course from a complete 9- or 18-hole definition.
+- `PUT /api/v1/courses/:courseId` is owner-only and requires `expectedUpdatedAt` for optimistic concurrency.
+- `POST /api/v1/courses/:courseId/archive` is owner-only and soft-archives rather than deleting.
+
+Each course must provide every sequential hole, unique tee names and display order, unique stroke indexes, and a yardage for every tee/hole pair. Potential same-name/location matches require explicit `acknowledgeDuplicate: true`; the warning does not expose owner permissions. The API derives the application owner from the verified access token, never a browser-submitted user ID. Round tracking is not included.
 
 Authentication routes are `/sign-in`, `/register`, `/auth/callback`, and `/profile/complete`. Provisioned accounts use `/app`. Post-authentication redirects accept only validated internal paths.
 
@@ -127,7 +135,6 @@ npm run db:studio
 
 ## Intentional Limitations
 
-- Placeholder views prove the public and core authenticated routes only.
-- Course/round CRUD, round persistence, IndexedDB sync, password reset, social login, and conflict resolution are pending.
+- Round CRUD, round persistence, IndexedDB sync, password reset, social login, and conflict resolution beyond course optimistic saves are pending.
 - Handicap storage is present, but no formula or recalculation job is implemented.
 - Account-retention/re-registration policy and browser Data API policies remain intentionally undecided; API authorization remains mandatory.

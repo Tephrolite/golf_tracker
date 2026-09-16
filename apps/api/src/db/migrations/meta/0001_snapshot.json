@@ -1,0 +1,1425 @@
+{
+  "id": "b1046bec-3e6d-4fe0-ac94-16841f10753f",
+  "prevId": "af38fd5d-68b4-47fe-be87-2adcced6922d",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.course_hole_yardages": {
+      "name": "course_hole_yardages",
+      "schema": "",
+      "columns": {
+        "course_tee_id": {
+          "name": "course_tee_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_hole_id": {
+          "name": "course_hole_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "yardage": {
+          "name": "yardage",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "course_hole_yardages_course_tee_id_course_tees_id_fk": {
+          "name": "course_hole_yardages_course_tee_id_course_tees_id_fk",
+          "tableFrom": "course_hole_yardages",
+          "tableTo": "course_tees",
+          "columnsFrom": [
+            "course_tee_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "course_hole_yardages_course_hole_id_course_holes_id_fk": {
+          "name": "course_hole_yardages_course_hole_id_course_holes_id_fk",
+          "tableFrom": "course_hole_yardages",
+          "tableTo": "course_holes",
+          "columnsFrom": [
+            "course_hole_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "course_hole_yardages_course_tee_id_course_hole_id_pk": {
+          "name": "course_hole_yardages_course_tee_id_course_hole_id_pk",
+          "columns": [
+            "course_tee_id",
+            "course_hole_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "course_hole_yardages_yardage_check": {
+          "name": "course_hole_yardages_yardage_check",
+          "value": "\"course_hole_yardages\".\"yardage\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.course_holes": {
+      "name": "course_holes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hole_number": {
+          "name": "hole_number",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "par": {
+          "name": "par",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stroke_index": {
+          "name": "stroke_index",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "course_holes_stroke_index_unique": {
+          "name": "course_holes_stroke_index_unique",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "stroke_index",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"course_holes\".\"stroke_index\" is not null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "course_holes_course_id_courses_id_fk": {
+          "name": "course_holes_course_id_courses_id_fk",
+          "tableFrom": "course_holes",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "course_holes_course_number_unique": {
+          "name": "course_holes_course_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "course_id",
+            "hole_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "course_holes_number_check": {
+          "name": "course_holes_number_check",
+          "value": "\"course_holes\".\"hole_number\" between 1 and 18"
+        },
+        "course_holes_par_check": {
+          "name": "course_holes_par_check",
+          "value": "\"course_holes\".\"par\" between 3 and 6"
+        },
+        "course_holes_stroke_index_check": {
+          "name": "course_holes_stroke_index_check",
+          "value": "\"course_holes\".\"stroke_index\" is null or \"course_holes\".\"stroke_index\" between 1 and 18"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.course_tees": {
+      "name": "course_tees",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_rating_18": {
+          "name": "course_rating_18",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "slope_rating_18": {
+          "name": "slope_rating_18",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "front_nine_rating": {
+          "name": "front_nine_rating",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "front_nine_slope": {
+          "name": "front_nine_slope",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "back_nine_rating": {
+          "name": "back_nine_rating",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "back_nine_slope": {
+          "name": "back_nine_slope",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_order": {
+          "name": "display_order",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "course_tees_course_idx": {
+          "name": "course_tees_course_idx",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "course_tees_active_name_unique": {
+          "name": "course_tees_active_name_unique",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lower(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"course_tees\".\"archived_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "course_tees_active_order_unique": {
+          "name": "course_tees_active_order_unique",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "display_order",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"course_tees\".\"archived_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "course_tees_course_id_courses_id_fk": {
+          "name": "course_tees_course_id_courses_id_fk",
+          "tableFrom": "course_tees",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "course_tees_slope_check": {
+          "name": "course_tees_slope_check",
+          "value": "(\"course_tees\".\"slope_rating_18\" is null or \"course_tees\".\"slope_rating_18\" between 55 and 155) and (\"course_tees\".\"front_nine_slope\" is null or \"course_tees\".\"front_nine_slope\" between 55 and 155) and (\"course_tees\".\"back_nine_slope\" is null or \"course_tees\".\"back_nine_slope\" between 55 and 155)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.courses": {
+      "name": "courses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "location_text": {
+          "name": "location_text",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hole_count": {
+          "name": "hole_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'draft'"
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'shared'"
+        },
+        "created_by_user_id": {
+          "name": "created_by_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "courses_name_lookup_idx": {
+          "name": "courses_name_lookup_idx",
+          "columns": [
+            {
+              "expression": "lower(\"name\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "courses_status_visibility_idx": {
+          "name": "courses_status_visibility_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "visibility",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "courses_created_by_user_id_users_id_fk": {
+          "name": "courses_created_by_user_id_users_id_fk",
+          "tableFrom": "courses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "courses_hole_count_check": {
+          "name": "courses_hole_count_check",
+          "value": "\"courses\".\"hole_count\" in (9, 18)"
+        },
+        "courses_status_check": {
+          "name": "courses_status_check",
+          "value": "\"courses\".\"status\" in ('draft', 'active', 'archived')"
+        },
+        "courses_visibility_check": {
+          "name": "courses_visibility_check",
+          "value": "\"courses\".\"visibility\" in ('shared', 'private')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.handicap_revision_rounds": {
+      "name": "handicap_revision_rounds",
+      "schema": "",
+      "columns": {
+        "handicap_revision_id": {
+          "name": "handicap_revision_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "round_id": {
+          "name": "round_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "differential_snapshot": {
+          "name": "differential_snapshot",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counted": {
+          "name": "counted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selection_order": {
+          "name": "selection_order",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "handicap_revision_rounds_handicap_revision_id_handicap_revisions_id_fk": {
+          "name": "handicap_revision_rounds_handicap_revision_id_handicap_revisions_id_fk",
+          "tableFrom": "handicap_revision_rounds",
+          "tableTo": "handicap_revisions",
+          "columnsFrom": [
+            "handicap_revision_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "handicap_revision_rounds_round_id_rounds_id_fk": {
+          "name": "handicap_revision_rounds_round_id_rounds_id_fk",
+          "tableFrom": "handicap_revision_rounds",
+          "tableTo": "rounds",
+          "columnsFrom": [
+            "round_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "handicap_revision_rounds_handicap_revision_id_round_id_pk": {
+          "name": "handicap_revision_rounds_handicap_revision_id_round_id_pk",
+          "columns": [
+            "handicap_revision_id",
+            "round_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.handicap_revisions": {
+      "name": "handicap_revisions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effective_at": {
+          "name": "effective_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "handicap_index": {
+          "name": "handicap_index",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eligible_round_count": {
+          "name": "eligible_round_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "counting_round_count": {
+          "name": "counting_round_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calculation_version": {
+          "name": "calculation_version",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trigger_type": {
+          "name": "trigger_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trigger_round_id": {
+          "name": "trigger_round_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "handicap_revisions_user_effective_idx": {
+          "name": "handicap_revisions_user_effective_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "effective_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "handicap_revisions_user_id_users_id_fk": {
+          "name": "handicap_revisions_user_id_users_id_fk",
+          "tableFrom": "handicap_revisions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "handicap_revisions_trigger_round_id_rounds_id_fk": {
+          "name": "handicap_revisions_trigger_round_id_rounds_id_fk",
+          "tableFrom": "handicap_revisions",
+          "tableTo": "rounds",
+          "columnsFrom": [
+            "trigger_round_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.round_holes": {
+      "name": "round_holes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "round_id": {
+          "name": "round_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_hole_id": {
+          "name": "course_hole_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hole_number": {
+          "name": "hole_number",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "play_sequence": {
+          "name": "play_sequence",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "par_snapshot": {
+          "name": "par_snapshot",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "yardage_snapshot": {
+          "name": "yardage_snapshot",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stroke_index_snapshot": {
+          "name": "stroke_index_snapshot",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "score": {
+          "name": "score",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "putts": {
+          "name": "putts",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fairway_result": {
+          "name": "fairway_result",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "green_in_regulation": {
+          "name": "green_in_regulation",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "penalty_strokes": {
+          "name": "penalty_strokes",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "varchar(2000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "last_client_updated_at": {
+          "name": "last_client_updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "round_holes_round_idx": {
+          "name": "round_holes_round_idx",
+          "columns": [
+            {
+              "expression": "round_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "round_holes_round_id_rounds_id_fk": {
+          "name": "round_holes_round_id_rounds_id_fk",
+          "tableFrom": "round_holes",
+          "tableTo": "rounds",
+          "columnsFrom": [
+            "round_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "round_holes_course_hole_id_course_holes_id_fk": {
+          "name": "round_holes_course_hole_id_course_holes_id_fk",
+          "tableFrom": "round_holes",
+          "tableTo": "course_holes",
+          "columnsFrom": [
+            "course_hole_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "round_holes_round_number_unique": {
+          "name": "round_holes_round_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "round_id",
+            "hole_number"
+          ]
+        },
+        "round_holes_round_sequence_unique": {
+          "name": "round_holes_round_sequence_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "round_id",
+            "play_sequence"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "round_holes_number_check": {
+          "name": "round_holes_number_check",
+          "value": "\"round_holes\".\"hole_number\" between 1 and 18 and \"round_holes\".\"play_sequence\" between 1 and 18"
+        },
+        "round_holes_score_check": {
+          "name": "round_holes_score_check",
+          "value": "\"round_holes\".\"score\" is null or \"round_holes\".\"score\" between 1 and 30"
+        },
+        "round_holes_putts_check": {
+          "name": "round_holes_putts_check",
+          "value": "\"round_holes\".\"putts\" is null or \"round_holes\".\"putts\" between 0 and 30"
+        },
+        "round_holes_penalty_check": {
+          "name": "round_holes_penalty_check",
+          "value": "\"round_holes\".\"penalty_strokes\" is null or \"round_holes\".\"penalty_strokes\" between 0 and 30"
+        },
+        "round_holes_fairway_check": {
+          "name": "round_holes_fairway_check",
+          "value": "\"round_holes\".\"fairway_result\" is null or \"round_holes\".\"fairway_result\" in ('hit', 'left', 'right')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.rounds": {
+      "name": "rounds",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_id": {
+          "name": "course_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "course_tee_id": {
+          "name": "course_tee_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'in_progress'"
+        },
+        "tracking_mode": {
+          "name": "tracking_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'basic'"
+        },
+        "scheduled_hole_count": {
+          "name": "scheduled_hole_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "starting_hole_number": {
+          "name": "starting_hole_number",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "played_on": {
+          "name": "played_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abandoned_at": {
+          "name": "abandoned_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "course_name_snapshot": {
+          "name": "course_name_snapshot",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_location_snapshot": {
+          "name": "course_location_snapshot",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tee_name_snapshot": {
+          "name": "tee_name_snapshot",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "course_rating_snapshot": {
+          "name": "course_rating_snapshot",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "slope_rating_snapshot": {
+          "name": "slope_rating_snapshot",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "course_par_snapshot": {
+          "name": "course_par_snapshot",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "handicap_eligible": {
+          "name": "handicap_eligible",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "handicap_ineligible_reason": {
+          "name": "handicap_ineligible_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "score_differential": {
+          "name": "score_differential",
+          "type": "numeric(5, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calculation_version": {
+          "name": "calculation_version",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revision": {
+          "name": "revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "last_client_updated_at": {
+          "name": "last_client_updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "rounds_user_history_idx": {
+          "name": "rounds_user_history_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "played_on",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "rounds_user_status_updated_idx": {
+          "name": "rounds_user_status_updated_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "rounds_course_idx": {
+          "name": "rounds_course_idx",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "one_in_progress_round_per_user": {
+          "name": "one_in_progress_round_per_user",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"rounds\".\"status\" = 'in_progress' and \"rounds\".\"deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "rounds_user_id_users_id_fk": {
+          "name": "rounds_user_id_users_id_fk",
+          "tableFrom": "rounds",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "rounds_course_id_courses_id_fk": {
+          "name": "rounds_course_id_courses_id_fk",
+          "tableFrom": "rounds",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "rounds_course_tee_id_course_tees_id_fk": {
+          "name": "rounds_course_tee_id_course_tees_id_fk",
+          "tableFrom": "rounds",
+          "tableTo": "course_tees",
+          "columnsFrom": [
+            "course_tee_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "rounds_status_check": {
+          "name": "rounds_status_check",
+          "value": "\"rounds\".\"status\" in ('in_progress', 'completed', 'abandoned', 'deleted')"
+        },
+        "rounds_tracking_mode_check": {
+          "name": "rounds_tracking_mode_check",
+          "value": "\"rounds\".\"tracking_mode\" in ('basic', 'detailed')"
+        },
+        "rounds_count_check": {
+          "name": "rounds_count_check",
+          "value": "\"rounds\".\"scheduled_hole_count\" in (9, 18)"
+        },
+        "rounds_starting_hole_check": {
+          "name": "rounds_starting_hole_check",
+          "value": "\"rounds\".\"starting_hole_number\" between 1 and 18"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.user_profiles": {
+      "name": "user_profiles",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "starting_handicap": {
+          "name": "starting_handicap",
+          "type": "numeric(4, 1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "starting_handicap_entered_at": {
+          "name": "starting_handicap_entered_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_profiles_user_id_users_id_fk": {
+          "name": "user_profiles_user_id_users_id_fk",
+          "tableFrom": "user_profiles",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "auth_provider": {
+          "name": "auth_provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auth_subject": {
+          "name": "auth_subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified_at": {
+          "name": "email_verified_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_auth_provider_subject_unique": {
+          "name": "users_auth_provider_subject_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "auth_provider",
+            "auth_subject"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

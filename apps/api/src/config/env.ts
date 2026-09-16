@@ -11,6 +11,8 @@ const environmentSchema = z.object({
 
 export type Environment = z.infer<typeof environmentSchema>;
 
-export function loadEnvironment(values: Record<string, string | undefined> = process.env): Environment {
+export function loadEnvironment(
+  values: Record<string, string | undefined> = process.env,
+): Environment {
   return environmentSchema.parse(values);
 }

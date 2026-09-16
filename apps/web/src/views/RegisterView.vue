@@ -1,6 +1,95 @@
 <script setup lang="ts">
-import { ref } from 'vue'; import { registrationSchema } from '@golf-track/shared'; import { supabase } from '../lib/supabase'; import { useRouter } from 'vue-router'; import { useProfileStore } from '../stores/profile';
-const displayName = ref(''); const email = ref(''); const password = ref(''); const passwordConfirmation = ref(''); const startingHandicap = ref(''); const error = ref(''); const confirmationEmail = ref<string | null>(null); const submitting = ref(false); const router = useRouter(); const profiles = useProfileStore();
-async function submit() { const handicap = startingHandicap.value === '' ? undefined : Number(startingHandicap.value); const parsed = registrationSchema.safeParse({ displayName: displayName.value, email: email.value, password: password.value, passwordConfirmation: passwordConfirmation.value, startingHandicap: handicap }); if (!parsed.success) { error.value = parsed.error.issues[0]?.message ?? 'Check your details.'; return; } submitting.value = true; error.value = ''; const { data, error: signUpError } = await supabase.auth.signUp({ email: parsed.data.email, password: parsed.data.password, options: { emailRedirectTo: `${window.location.origin}/auth/callback`, data: { displayName: parsed.data.displayName, startingHandicap: parsed.data.startingHandicap ?? null } } }); if (signUpError) { error.value = 'We could not create your account. Please try another email or try again.'; submitting.value = false; return; } if (!data.session) { confirmationEmail.value = parsed.data.email; submitting.value = false; return; } await profiles.bootstrap({ displayName: parsed.data.displayName, startingHandicap: parsed.data.startingHandicap }); await router.push('/app'); submitting.value = false; }
+import { ref } from 'vue';
+import { registrationSchema } from '@golf-track/shared';
+import { supabase } from '../lib/supabase';
+import { useRouter } from 'vue-router';
+import { useProfileStore } from '../stores/profile';
+const displayName = ref('');
+const email = ref('');
+const password = ref('');
+const passwordConfirmation = ref('');
+const startingHandicap = ref('');
+const error = ref('');
+const confirmationEmail = ref<string | null>(null);
+const submitting = ref(false);
+const router = useRouter();
+const profiles = useProfileStore();
+async function submit() {
+  const handicap = startingHandicap.value === '' ? undefined : Number(startingHandicap.value);
+  const parsed = registrationSchema.safeParse({
+    displayName: displayName.value,
+    email: email.value,
+    password: password.value,
+    passwordConfirmation: passwordConfirmation.value,
+    startingHandicap: handicap,
+  });
+  if (!parsed.success) {
+    error.value = parsed.error.issues[0]?.message ?? 'Check your details.';
+    return;
+  }
+  submitting.value = true;
+  error.value = '';
+  const { data, error: signUpError } = await supabase.auth.signUp({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    options: {
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      data: {
+        displayName: parsed.data.displayName,
+        startingHandicap: parsed.data.startingHandicap ?? null,
+      },
+    },
+  });
+  if (signUpError) {
+    error.value = 'We could not create your account. Please try another email or try again.';
+    submitting.value = false;
+    return;
+  }
+  if (!data.session) {
+    confirmationEmail.value = parsed.data.email;
+    submitting.value = false;
+    return;
+  }
+  await profiles.bootstrap({
+    displayName: parsed.data.displayName,
+    startingHandicap: parsed.data.startingHandicap,
+  });
+  await router.push('/app');
+  submitting.value = false;
+}
 </script>
-<template><section><h1>Create Account</h1><div v-if="confirmationEmail"><p>Check your email at {{ confirmationEmail }} and follow the confirmation link to finish setting up your account.</p><RouterLink to="/sign-in">Sign In</RouterLink></div><form v-else @submit.prevent="submit"><label>Name<input v-model="displayName" autocomplete="name" /></label><label>Email<input v-model="email" type="email" autocomplete="email" /></label><label>Password<input v-model="password" type="password" autocomplete="new-password" /></label><label>Confirm password<input v-model="passwordConfirmation" type="password" autocomplete="new-password" /></label><label>Starting handicap (optional)<input v-model="startingHandicap" type="number" min="-10" max="54" step="0.1" /></label><p>Starting handicap is optional and is separate from a future calculated handicap.</p><p v-if="error" role="alert">{{ error }}</p><button :disabled="submitting">{{ submitting ? 'Creating...' : 'Create Account' }}</button></form><RouterLink to="/sign-in">Sign In</RouterLink></section></template>
+<template>
+  <section>
+    <h1>Create Account</h1>
+    <div v-if="confirmationEmail">
+      <p>
+        Check your email at {{ confirmationEmail }} and follow the confirmation link to finish
+        setting up your account.
+      </p>
+      <RouterLink to="/sign-in">Sign In</RouterLink>
+    </div>
+    <form v-else @submit.prevent="submit">
+      <label>Name<input v-model="displayName" autocomplete="name" /></label
+      ><label>Email<input v-model="email" type="email" autocomplete="email" /></label
+      ><label
+        >Password<input v-model="password" type="password" autocomplete="new-password" /></label
+      ><label
+        >Confirm password<input
+          v-model="passwordConfirmation"
+          type="password"
+          autocomplete="new-password" /></label
+      ><label
+        >Starting handicap (optional)<input
+          v-model="startingHandicap"
+          type="number"
+          min="-10"
+          max="54"
+          step="0.1"
+      /></label>
+      <p>Starting handicap is optional and is separate from a future calculated handicap.</p>
+      <p v-if="error" role="alert">{{ error }}</p>
+      <button :disabled="submitting">{{ submitting ? 'Creating...' : 'Create Account' }}</button>
+    </form>
+    <RouterLink to="/sign-in">Sign In</RouterLink>
+  </section>
+</template>

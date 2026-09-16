@@ -1,6 +1,49 @@
 <script setup lang="ts">
-import { ref } from 'vue'; import { signInSchema } from '@golf-track/shared'; import { supabase } from '../lib/supabase'; import { resolveInternalRedirect } from '../router/redirect'; import { useRouter, useRoute } from 'vue-router'; import { useProfileStore } from '../stores/profile';
-const email = ref(''); const password = ref(''); const error = ref(''); const submitting = ref(false); const router = useRouter(); const route = useRoute(); const profiles = useProfileStore();
-async function submit() { const parsed = signInSchema.safeParse({ email: email.value, password: password.value }); if (!parsed.success) { error.value = parsed.error.issues[0]?.message ?? 'Check your details.'; return; } submitting.value = true; error.value = ''; const { error: signInError } = await supabase.auth.signInWithPassword(parsed.data); if (signInError) { error.value = 'Email or password is incorrect.'; submitting.value = false; return; } await profiles.restore(); await router.push(profiles.hasProfile ? resolveInternalRedirect(route.query.redirect) : '/profile/complete'); submitting.value = false; }
+import { ref } from 'vue';
+import { signInSchema } from '@golf-track/shared';
+import { supabase } from '../lib/supabase';
+import { resolveInternalRedirect } from '../router/redirect';
+import { useRouter, useRoute } from 'vue-router';
+import { useProfileStore } from '../stores/profile';
+const email = ref('');
+const password = ref('');
+const error = ref('');
+const submitting = ref(false);
+const router = useRouter();
+const route = useRoute();
+const profiles = useProfileStore();
+async function submit() {
+  const parsed = signInSchema.safeParse({ email: email.value, password: password.value });
+  if (!parsed.success) {
+    error.value = parsed.error.issues[0]?.message ?? 'Check your details.';
+    return;
+  }
+  submitting.value = true;
+  error.value = '';
+  const { error: signInError } = await supabase.auth.signInWithPassword(parsed.data);
+  if (signInError) {
+    error.value = 'Email or password is incorrect.';
+    submitting.value = false;
+    return;
+  }
+  await profiles.restore();
+  await router.push(
+    profiles.hasProfile ? resolveInternalRedirect(route.query.redirect) : '/profile/complete',
+  );
+  submitting.value = false;
+}
 </script>
-<template><section><h1>Sign In</h1><form @submit.prevent="submit"><label>Email<input v-model="email" type="email" autocomplete="email" /></label><label>Password<input v-model="password" type="password" autocomplete="current-password" /></label><p v-if="error" role="alert">{{ error }}</p><button :disabled="submitting">{{ submitting ? 'Signing in...' : 'Sign In' }}</button></form><RouterLink to="/register">Create Account</RouterLink></section></template>
+<template>
+  <section>
+    <h1>Sign In</h1>
+    <form @submit.prevent="submit">
+      <label>Email<input v-model="email" type="email" autocomplete="email" /></label
+      ><label
+        >Password<input v-model="password" type="password" autocomplete="current-password"
+      /></label>
+      <p v-if="error" role="alert">{{ error }}</p>
+      <button :disabled="submitting">{{ submitting ? 'Signing in...' : 'Sign In' }}</button>
+    </form>
+    <RouterLink to="/register">Create Account</RouterLink>
+  </section>
+</template>

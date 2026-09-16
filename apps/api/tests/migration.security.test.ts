@@ -1,7 +1,18 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
-const tables = ['users', 'user_profiles', 'courses', 'course_tees', 'course_holes', 'course_hole_yardages', 'rounds', 'round_holes', 'handicap_revisions', 'handicap_revision_rounds'];
+const tables = [
+  'users',
+  'user_profiles',
+  'courses',
+  'course_tees',
+  'course_holes',
+  'course_hole_yardages',
+  'rounds',
+  'round_holes',
+  'handicap_revisions',
+  'handicap_revision_rounds',
+];
 
 describe('initial migration security SQL', () => {
   async function initialMigration() {
@@ -20,13 +31,17 @@ describe('initial migration security SQL', () => {
   });
   it('contains all cross-table trigger protections and the active-round index', async () => {
     const migration = await initialMigration();
-    expect(migration).toContain('validate_course_hole_number'); expect(migration).toContain('validate_course_hole_yardage_course');
-    expect(migration).toContain('validate_round_catalog_integrity'); expect(migration).toContain('validate_round_hole_sequence');
+    expect(migration).toContain('validate_course_hole_number');
+    expect(migration).toContain('validate_course_hole_yardage_course');
+    expect(migration).toContain('validate_round_catalog_integrity');
+    expect(migration).toContain('validate_round_hole_sequence');
     expect(migration).toContain('course hole number must not exceed the parent course hole count');
     expect(migration).toContain('course tee and course hole must belong to the same course');
     expect(migration).toContain('round course tee must belong to the selected course');
     expect(migration).toContain('round starting hole must exist for the selected course');
-    expect(migration).toContain('round-hole play sequence must not exceed the parent round scheduled hole count');
+    expect(migration).toContain(
+      'round-hole play sequence must not exceed the parent round scheduled hole count',
+    );
     expect(migration).toContain('one_in_progress_round_per_user');
   });
 });

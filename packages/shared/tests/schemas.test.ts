@@ -20,7 +20,21 @@ describe('shared schemas', () => {
     expect(profileSchema.safeParse({ id: 'not-a-uuid' }).success).toBe(false);
   });
   it('normalizes registration email and rejects mismatched passwords', () => {
-    expect(registrationSchema.parse({ displayName: ' Taylor ', email: ' TAYLOR@EXAMPLE.COM ', password: 'password1', passwordConfirmation: 'password1' }).email).toBe('taylor@example.com');
-    expect(registrationSchema.safeParse({ displayName: 'Taylor', email: 'taylor@example.com', password: 'password1', passwordConfirmation: 'different' }).success).toBe(false);
+    expect(
+      registrationSchema.parse({
+        displayName: ' Taylor ',
+        email: ' TAYLOR@EXAMPLE.COM ',
+        password: 'password1',
+        passwordConfirmation: 'password1',
+      }).email,
+    ).toBe('taylor@example.com');
+    expect(
+      registrationSchema.safeParse({
+        displayName: 'Taylor',
+        email: 'taylor@example.com',
+        password: 'password1',
+        passwordConfirmation: 'different',
+      }).success,
+    ).toBe(false);
   });
 });

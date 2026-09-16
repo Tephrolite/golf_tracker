@@ -6,7 +6,26 @@ import { createProfileRepository } from '../src/modules/profiles/profile.reposit
 function databaseReturning(startingHandicap: string | null) {
   let whereClause: unknown;
   const db = {
-    select: () => ({ from: () => ({ innerJoin: () => ({ where: (clause: unknown) => { whereClause = clause; return { limit: async () => [{ id: 'a1b2c3d4-1111-4222-8333-444444444444', displayName: 'Taylor', email: 'taylor@example.com', startingHandicap, createdAt: new Date('2026-01-01T00:00:00Z') }] }; } }) }) }),
+    select: () => ({
+      from: () => ({
+        innerJoin: () => ({
+          where: (clause: unknown) => {
+            whereClause = clause;
+            return {
+              limit: async () => [
+                {
+                  id: 'a1b2c3d4-1111-4222-8333-444444444444',
+                  displayName: 'Taylor',
+                  email: 'taylor@example.com',
+                  startingHandicap,
+                  createdAt: new Date('2026-01-01T00:00:00Z'),
+                },
+              ],
+            };
+          },
+        }),
+      }),
+    }),
   } as unknown as Database;
   return { repository: createProfileRepository(db), whereClause: () => whereClause };
 }
@@ -25,6 +44,8 @@ describe('profile repository', () => {
   });
   it('preserves a null starting handicap', async () => {
     const testDatabase = databaseReturning(null);
-    expect((await testDatabase.repository.findByAuthSubject('subject'))?.startingHandicap).toBeNull();
+    expect(
+      (await testDatabase.repository.findByAuthSubject('subject'))?.startingHandicap,
+    ).toBeNull();
   });
 });

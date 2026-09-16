@@ -4,14 +4,25 @@ import WebSocket from 'ws';
 import type { WebSocketLikeConstructor } from '@supabase/realtime-js';
 import type { Environment } from '../config/env.js';
 
-export interface AuthenticatedIdentity { subject: string; email: string | null }
-export interface AuthVerifier { verify(accessToken: string): Promise<AuthenticatedIdentity | null> }
-
-class SupabaseWebSocket extends WebSocket {
-  constructor(address: string | URL, subprotocols?: string | string[]) { super(address, subprotocols); }
+export interface AuthenticatedIdentity {
+  subject: string;
+  email: string | null;
+}
+export interface AuthVerifier {
+  verify(accessToken: string): Promise<AuthenticatedIdentity | null>;
 }
 
-declare module 'fastify' { interface FastifyRequest { identity: AuthenticatedIdentity | null } }
+class SupabaseWebSocket extends WebSocket {
+  constructor(address: string | URL, subprotocols?: string | string[]) {
+    super(address, subprotocols);
+  }
+}
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    identity: AuthenticatedIdentity | null;
+  }
+}
 
 export function createSupabaseAuthVerifier(environment: Environment): AuthVerifier {
   const supabase = createClient(environment.SUPABASE_URL, environment.SUPABASE_PUBLISHABLE_KEY, {

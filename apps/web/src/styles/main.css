@@ -1,1 +1,162 @@
-:root { color: #18251d; background: #f8f8f3; font-family: Georgia, serif; } body { margin: 0; } section { padding: 2rem 1.25rem 6rem; } h1 { color: #164d2d; } nav { position: fixed; bottom: 0; display: flex; width: 100%; justify-content: space-around; padding: .75rem 0; background: #fff; border-top: 1px solid #c9d0c5; } a { color: #164d2d; text-decoration: none; min-width: 44px; } .start { font-weight: bold; }
+:root {
+  color: #18251d;
+  background: #f8f8f3;
+  font-family: Georgia, serif;
+}
+body {
+  margin: 0;
+}
+section {
+  padding: 2rem 1.25rem 6rem;
+}
+h1 {
+  color: #164d2d;
+}
+nav {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  padding: 0.75rem 0;
+  background: #fff;
+  border-top: 1px solid #c9d0c5;
+}
+a {
+  color: #164d2d;
+  text-decoration: none;
+  min-width: 44px;
+}
+.start {
+  font-weight: bold;
+}
+.catalog {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.catalog header,
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.eyebrow {
+  color: #6a5740;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.command,
+button {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid #164d2d;
+  background: #164d2d;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+button.danger {
+  border-color: #8f3023;
+  background: #8f3023;
+}
+input,
+select {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0.35rem;
+  padding: 0.5rem;
+  font: inherit;
+  border: 1px solid #8e9b8b;
+  background: white;
+}
+label {
+  display: block;
+  margin: 0.8rem 0;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+.search {
+  display: flex;
+  gap: 0.75rem;
+  align-items: end;
+  margin: 1.5rem 0;
+}
+.search label {
+  flex: 1;
+  margin: 0;
+}
+.course-list,
+.tee-list {
+  border-top: 1px solid #c9d0c5;
+}
+.course-row,
+.tee-list > div {
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #c9d0c5;
+}
+.hole-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 0.75rem;
+}
+.hole-grid > div,
+.hole-edit {
+  border: 1px solid #c9d0c5;
+  padding: 0.75rem;
+  background: #fff;
+}
+.hole-grid span {
+  display: block;
+  margin-top: 0.25rem;
+}
+.tee-edit {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.tee-edit input {
+  margin: 0;
+}
+.hole-edit {
+  display: grid;
+  grid-template-columns: 36px repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: end;
+}
+.hole-edit label {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+@media (max-width: 560px) {
+  .course-row,
+  .tee-list > div {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .search {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .hole-edit {
+    grid-template-columns: 30px repeat(2, minmax(90px, 1fr));
+  }
+}

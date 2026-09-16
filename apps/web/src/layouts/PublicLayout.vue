@@ -1,1 +1,3 @@
-<template><main class="public"><RouterView /></main></template>
+<template>
+  <main class="public"><RouterView /></main>
+</template>

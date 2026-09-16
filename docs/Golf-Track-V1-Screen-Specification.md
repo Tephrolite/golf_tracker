@@ -83,13 +83,13 @@ Version 1 does not include social features, leaderboards, friends, shared scorec
 
 Authenticated screens use a persistent bottom navigation on mobile:
 
-| Position | Label | Destination |
-|---|---|---|
-| 1 | Home | Home dashboard |
-| 2 | Rounds | Round history |
-| 3 | Start or Resume | Round setup or active round |
-| 4 | Courses | Course list |
-| 5 | Profile | Profile overview |
+| Position | Label           | Destination                 |
+| -------- | --------------- | --------------------------- |
+| 1        | Home            | Home dashboard              |
+| 2        | Rounds          | Round history               |
+| 3        | Start or Resume | Round setup or active round |
+| 4        | Courses         | Course list                 |
+| 5        | Profile         | Profile overview            |
 
 The center action is visually dominant. It changes to **Resume** and displays an in-progress indicator when an active round exists. The navigation keeps the same position and shape so the user does not need to relearn it during play.
 
@@ -656,27 +656,27 @@ Destructive actions must identify the affected item, explain the consequence, an
 
 Exact route syntax can change with the selected framework architecture, but the following map expresses the intended destinations:
 
-| Route | Screen | Access |
-|---|---|---|
-| `/` | Landing or authenticated redirect | Public |
-| `/sign-in` | Sign In | Public |
-| `/register` | Create Account | Public |
-| `/app` | Home | Private |
-| `/app/rounds` | Round History | Private |
-| `/app/rounds/:roundId` | Round Details | Private |
-| `/app/rounds/:roundId/edit` | Edit Completed Round | Private |
-| `/app/round/start` | Course Selection | Private |
-| `/app/round/setup/:courseId` | Round Setup | Private |
-| `/app/round/active` | Active Round | Private |
-| `/app/round/active/scorecard` | Active Scorecard | Private |
-| `/app/round/summary/:roundId` | Round Summary | Private |
-| `/app/courses` | Course List | Private |
-| `/app/courses/new` | Add Course | Private |
-| `/app/courses/:courseId` | Course Details | Private |
-| `/app/courses/:courseId/edit` | Edit Owned Course | Private |
-| `/app/profile` | Profile Overview | Private |
-| `/app/profile/handicap` | Handicap Details | Private |
-| `/app/profile/settings` | Account Settings | Private |
+| Route                         | Screen                            | Access  |
+| ----------------------------- | --------------------------------- | ------- |
+| `/`                           | Landing or authenticated redirect | Public  |
+| `/sign-in`                    | Sign In                           | Public  |
+| `/register`                   | Create Account                    | Public  |
+| `/app`                        | Home                              | Private |
+| `/app/rounds`                 | Round History                     | Private |
+| `/app/rounds/:roundId`        | Round Details                     | Private |
+| `/app/rounds/:roundId/edit`   | Edit Completed Round              | Private |
+| `/app/round/start`            | Course Selection                  | Private |
+| `/app/round/setup/:courseId`  | Round Setup                       | Private |
+| `/app/round/active`           | Active Round                      | Private |
+| `/app/round/active/scorecard` | Active Scorecard                  | Private |
+| `/app/round/summary/:roundId` | Round Summary                     | Private |
+| `/app/courses`                | Course List                       | Private |
+| `/app/courses/new`            | Add Course                        | Private |
+| `/app/courses/:courseId`      | Course Details                    | Private |
+| `/app/courses/:courseId/edit` | Edit Owned Course                 | Private |
+| `/app/profile`                | Profile Overview                  | Private |
+| `/app/profile/handicap`       | Handicap Details                  | Private |
+| `/app/profile/settings`       | Account Settings                  | Private |
 
 The active-round route should resolve the user's current draft rather than exposing a round identifier that could be replaced with another user's ID.
 
@@ -711,4 +711,3 @@ The following do not block the screen specification, but must be decided during 
 - Progressive Web App installation and background-sync support
 
 These decisions should preserve the product rules and screen behaviors defined above.
-

@@ -2,8 +2,14 @@
   "name": "golf-track",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
-  "engines": { "node": ">=20.0.0", "npm": ">=10.0.0" },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "set \"PATH=%SystemRoot%\\System32;%PATH%\" && concurrently -n web,api -c green,blue \"npm run dev -w @golf-track/web\" \"npm run dev -w @golf-track/api\"",
     "dev:web": "npm run dev -w @golf-track/web",
